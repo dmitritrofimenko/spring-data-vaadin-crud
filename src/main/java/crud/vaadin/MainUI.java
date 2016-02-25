@@ -7,6 +7,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import crud.backend.Person;
 import crud.backend.PersonRepository;
@@ -47,6 +48,13 @@ public class MainUI extends UI {
     private Button edit = new MButton(FontAwesome.PENCIL_SQUARE_O, this::edit);
     private Button delete = new ConfirmButton(FontAwesome.TRASH_O,
             "Are you sure you want to delete the entry?", this::remove);
+    private LoginForm loginForm=new LoginForm("Please Login","Login","Login","Password","Admin","Admin") {
+        @Override
+        public void buttonClicked() {
+            Notification.show("clicked");
+        }
+    };
+
 
     @Override
     protected void init(VaadinRequest request) {
@@ -59,6 +67,7 @@ public class MainUI extends UI {
         );
         listEntities();
         list.addMValueChangeListener(e -> adjustActionButtonState());
+        UI.getCurrent().addWindow(loginForm);
     }
 
     protected void adjustActionButtonState() {
