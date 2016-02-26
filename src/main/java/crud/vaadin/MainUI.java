@@ -7,6 +7,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import crud.backend.Person;
@@ -30,20 +31,19 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 @SpringUI
 public class MainUI extends UI {
 
-	/**
-	 * 
-	 */
+    static final int PAGESIZE = 45;
+    /**
+     *
+     */
 	private static final long serialVersionUID = 1L;
-
 	@Autowired
     PersonRepository repo;
-
     private MTable<Person> list = new MTable<>(Person.class)
             .withProperties("id", "name", "email")
             .withColumnHeaders("id", "Name", "Email")
             .setSortableProperties("name", "email")
-            .withFullWidth();
 
+            .withFullWidth();
     private Button addNew = new MButton(FontAwesome.PLUS, this::add);
     private Button edit = new MButton(FontAwesome.PENCIL_SQUARE_O, this::edit);
     private Button delete = new ConfirmButton(FontAwesome.TRASH_O,
@@ -55,15 +55,30 @@ public class MainUI extends UI {
         }
     };
 
-
     @Override
     protected void init(VaadinRequest request) {
-        setContent(
+        LeftSide leftSide = new LeftSide();
+        HorizontalSplitPanel horisontalSplitPanel = new HorizontalSplitPanel();
+        horisontalSplitPanel.setFirstComponent(leftSide);
+        horisontalSplitPanel.setSecondComponent(
                 new MVerticalLayout(
                         new RichText().withMarkDownResource("/welcome.md"),
                         new MHorizontalLayout(addNew, edit, delete),
+
                         list
                 ).expand(list)
+
+        );
+
+        horisontalSplitPanel.setHeight(100, Unit.PERCENTAGE);
+        horisontalSplitPanel.setSplitPosition(25, Unit.PERCENTAGE);
+        horisontalSplitPanel.setMinSplitPosition(10, Unit.PERCENTAGE);
+
+
+        setContent(
+
+                horisontalSplitPanel
+
         );
         listEntities();
         list.addMValueChangeListener(e -> adjustActionButtonState());
@@ -75,8 +90,6 @@ public class MainUI extends UI {
         edit.setEnabled(hasSelection);
         delete.setEnabled(hasSelection);
     }
-
-    static final int PAGESIZE = 45;
 
     private void listEntities() {
         // A dead simple in memory listing would be:
